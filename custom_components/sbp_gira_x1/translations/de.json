@@ -1,0 +1,43 @@
+{
+  "title": "SBP Gira X1",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Gira X1 verbinden",
+        "description": "Das Passwort wird nur einmal verwendet, um diesen Home-Assistant-Client zu registrieren. Gespeichert wird ausschließlich das vom Gira X1 ausgestellte Token.",
+        "data": {
+          "host": "Hostname oder IP-Adresse des Gira X1",
+          "username": "Gira-X1-Benutzername",
+          "password": "Gira-X1-Passwort",
+          "scan_interval": "Abrufintervall in Sekunden"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Gira-X1-Zugriff erneuern",
+        "description": "Aktuelle Gira-X1-Zugangsdaten eingeben. Nach Ausstellung des neuen Tokens werden sie nicht gespeichert.",
+        "data": {
+          "username": "Gira-X1-Benutzername",
+          "password": "Gira-X1-Passwort"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Keine Verbindung zu einem Gerät mit Gira IoT REST API v2 möglich.",
+      "invalid_auth": "Der Gira X1 hat die Zugangsdaten abgelehnt."
+    },
+    "abort": {
+      "already_configured": "Dieser Gira X1 ist bereits eingerichtet.",
+      "reauth_successful": "Das Gira-X1-Token wurde erneuert."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "SBP-Gira-X1-Optionen",
+        "data": {
+          "scan_interval": "Abrufintervall in Sekunden"
+        }
+      }
+    }
+  }
+}

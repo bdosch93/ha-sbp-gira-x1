@@ -1,0 +1,43 @@
+{
+  "title": "SBP Gira X1",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect Gira X1",
+        "description": "The password is used only once to register this Home Assistant client. Only the returned Gira token is stored.",
+        "data": {
+          "host": "Gira X1 host or IP address",
+          "username": "Gira X1 user name",
+          "password": "Gira X1 password",
+          "scan_interval": "Polling interval in seconds"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Renew Gira X1 access token",
+        "description": "Enter the current Gira X1 credentials. They are not retained after a new token has been issued.",
+        "data": {
+          "username": "Gira X1 user name",
+          "password": "Gira X1 password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not connect to a Gira IoT REST API v2 device.",
+      "invalid_auth": "The Gira X1 rejected the credentials."
+    },
+    "abort": {
+      "already_configured": "This Gira X1 is already configured.",
+      "reauth_successful": "The Gira X1 token was renewed."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "SBP Gira X1 options",
+        "data": {
+          "scan_interval": "Polling interval in seconds"
+        }
+      }
+    }
+  }
+}

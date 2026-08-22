@@ -1,0 +1,6 @@
+{
+  "name": "SBP Gira X1",
+  "render_readme": true,
+  "domains": ["binary_sensor", "climate", "cover", "light", "sensor", "switch"],
+  "homeassistant": "2026.8.0"
+}
