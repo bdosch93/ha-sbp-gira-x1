@@ -127,6 +127,18 @@ class ParseUiConfigTests(unittest.TestCase):
 
         self.assertIsNone(function.scene_number())
 
+    def test_function_scene_uses_execute_trigger(self):
+        function = module.GiraFunction(
+            uid="function-scene-1",
+            name="Beschattung",
+            function_type="de.gira.schema.functions.FunctionScene",
+            channel_type="de.gira.schema.channels.FunctionScene",
+            data_points={},
+        )
+
+        self.assertIsNone(function.scene_number())
+        self.assertEqual(function.scene_recall_value(), 1)
+
 
 if __name__ == "__main__":
     unittest.main()

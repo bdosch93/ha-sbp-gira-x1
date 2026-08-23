@@ -26,10 +26,12 @@ PLATFORMS: Final = (
 )
 
 SCENE_FUNCTION_TYPES: Final = {
+    "de.gira.schema.functions.FunctionScene",
     "de.gira.schema.functions.Scene",
 }
 
 SCENE_CHANNEL_TYPES: Final = {
+    "de.gira.schema.channels.FunctionScene",
     "de.gira.schema.channels.SceneControl",
     "de.gira.schema.channels.SceneSet",
 }

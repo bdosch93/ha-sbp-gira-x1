@@ -14,7 +14,10 @@ from .models import GiraFunction
 
 def _scene_point_name(function: GiraFunction) -> str | None:
     """Return the recall-only data point for a supported scene channel."""
-    if function.channel_type == "de.gira.schema.channels.SceneSet":
+    if function.channel_type in {
+        "de.gira.schema.channels.FunctionScene",
+        "de.gira.schema.channels.SceneSet",
+    }:
         return "Execute"
     if function.channel_type == "de.gira.schema.channels.SceneControl":
         return "Scene"
@@ -28,7 +31,7 @@ def _is_recallable_scene(function: GiraFunction) -> bool:
     return (
         function.function_type in SCENE_FUNCTION_TYPES
         and function.channel_type in SCENE_CHANNEL_TYPES
-        and function.scene_number() is not None
+        and function.scene_recall_value() is not None
         and point is not None
         and point.can_write
     )
@@ -55,14 +58,15 @@ class GiraX1SceneButton(GiraX1Entity, ButtonEntity):
 
     def __init__(self, coordinator, function: GiraFunction) -> None:
         super().__init__(coordinator, function)
+        self._recall_value = function.scene_recall_value()
         self._scene_number = function.scene_number()
         self._point_name = _scene_point_name(function)
 
     async def async_press(self) -> None:
         """Recall the configured X1 scene; never write the Teach point."""
-        if self._scene_number is None or self._point_name is None:
+        if self._recall_value is None or self._point_name is None:
             return
-        await self.write(self._point_name, self._scene_number)
+        await self.write(self._point_name, self._recall_value)
 
     @property
     def extra_state_attributes(self):

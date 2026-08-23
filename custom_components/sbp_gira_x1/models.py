@@ -57,6 +57,15 @@ class GiraFunction:
                 return number
         return None
 
+    def scene_recall_value(self) -> int | None:
+        """Return the safe value that recalls this Gira scene function."""
+        if (
+            self.function_type == "de.gira.schema.functions.FunctionScene"
+            and self.channel_type == "de.gira.schema.channels.FunctionScene"
+        ):
+            return 1
+        return self.scene_number()
+
 
 def _function_uid(value: Any) -> str | None:
     """Extract a function UID from the two shapes used by Gira firmware."""
