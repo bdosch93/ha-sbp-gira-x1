@@ -4,7 +4,7 @@ Local Home Assistant integration for a Gira X1 using the official Gira IoT
 REST API v2. It deliberately does **not** use Home Assistant's KNX integration
 and does not require a cloud service or an inbound callback server.
 
-## Supported in 0.2.1
+## Supported in 0.2.2
 
 - switches, switched sockets and KNX lights (on/off, brightness and color temperature when exposed)
 - covers (open, close, stop, position and slat position when exposed)
