@@ -90,6 +90,43 @@ class ParseUiConfigTests(unittest.TestCase):
 
         self.assertFalse(module.exposes_cover_tilt(function, is_shutter=False))
 
+    def test_scene_number_from_key_parameter(self):
+        function = module.GiraFunction(
+            uid="scene-1",
+            name="Sonnig",
+            function_type="de.gira.schema.functions.Scene",
+            channel_type="de.gira.schema.channels.SceneSet",
+            data_points={},
+            parameters=({"key": "Scene", "value": "12"},),
+        )
+
+        self.assertEqual(function.parameter("scene"), 12)
+        self.assertEqual(function.scene_number(), 12)
+
+    def test_scene_number_from_name_parameter(self):
+        function = module.GiraFunction(
+            uid="scene-2",
+            name="Schatten",
+            function_type="de.gira.schema.functions.Scene",
+            channel_type="de.gira.schema.channels.SceneControl",
+            data_points={},
+            parameters=({"name": "Scene", "value": 64},),
+        )
+
+        self.assertEqual(function.scene_number(), 64)
+
+    def test_scene_number_rejects_out_of_range_values(self):
+        function = module.GiraFunction(
+            uid="scene-3",
+            name="Ungültig",
+            function_type="de.gira.schema.functions.Scene",
+            channel_type="de.gira.schema.channels.SceneSet",
+            data_points={},
+            parameters=({"key": "Scene", "value": "65"},),
+        )
+
+        self.assertIsNone(function.scene_number())
+
 
 if __name__ == "__main__":
     unittest.main()

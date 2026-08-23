@@ -34,6 +34,29 @@ class GiraFunction:
         """Return a data point by its logical channel name."""
         return self.data_points.get(name)
 
+    def parameter(self, name: str) -> Any:
+        """Return a UI-config parameter by name across Gira firmware shapes."""
+        wanted = name.casefold()
+        for parameter in self.parameters:
+            key = (
+                parameter.get("key")
+                or parameter.get("name")
+                or parameter.get("parameter")
+                or parameter.get("parameterName")
+            )
+            if str(key or "").casefold() == wanted:
+                return coerce_value(parameter.get("value"))
+        return None
+
+    def scene_number(self) -> int | None:
+        """Return the configured Gira scene number when it is valid."""
+        value = self.parameter("Scene")
+        if isinstance(value, (int, float)) and int(value) == value:
+            number = int(value)
+            if 1 <= number <= 64:
+                return number
+        return None
+
 
 def _function_uid(value: Any) -> str | None:
     """Extract a function UID from the two shapes used by Gira firmware."""

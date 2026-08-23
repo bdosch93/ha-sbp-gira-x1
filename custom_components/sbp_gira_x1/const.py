@@ -17,12 +17,22 @@ CLIENT_ID: Final = "io.github.bdosch93.homeassistant.gira_x1"
 
 PLATFORMS: Final = (
     Platform.BINARY_SENSOR,
+    Platform.BUTTON,
     Platform.CLIMATE,
     Platform.COVER,
     Platform.LIGHT,
     Platform.SENSOR,
     Platform.SWITCH,
 )
+
+SCENE_FUNCTION_TYPES: Final = {
+    "de.gira.schema.functions.Scene",
+}
+
+SCENE_CHANNEL_TYPES: Final = {
+    "de.gira.schema.channels.SceneControl",
+    "de.gira.schema.channels.SceneSet",
+}
 
 LIGHT_FUNCTION_TYPES: Final = {
     "de.gira.schema.functions.KNX.Light",
