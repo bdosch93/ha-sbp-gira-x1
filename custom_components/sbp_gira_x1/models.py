@@ -121,6 +121,18 @@ def coerce_value(value: Any) -> Any:
     return int(number) if number.is_integer() else number
 
 
+def exposes_cover_tilt(function: GiraFunction, *, is_shutter: bool) -> bool:
+    """Return whether a cover should expose a writable tilt control.
+
+    Gira projects can expose a writable ``Slat-Position`` data point even for
+    roller shutters that have no user-visible tilt capability. Home Assistant's
+    user-selected ``shutter`` device class is the authoritative presentation
+    override in that case.
+    """
+    point = function.point("Slat-Position")
+    return not is_shutter and point is not None and point.can_write
+
+
 def as_bool(value: Any) -> bool | None:
     """Convert a Gira binary value to bool."""
     native = coerce_value(value)

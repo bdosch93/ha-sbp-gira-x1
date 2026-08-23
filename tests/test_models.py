@@ -55,6 +55,41 @@ class ParseUiConfigTests(unittest.TestCase):
         self.assertTrue(module.as_bool("1"))
         self.assertFalse(module.as_bool("0"))
 
+    def test_cover_tilt_is_hidden_for_shutters(self):
+        function = module.GiraFunction(
+            uid="cover-1",
+            name="Rollladen",
+            function_type="de.gira.schema.functions.Covering",
+            channel_type="de.gira.schema.channels.KNX.Covering",
+            data_points={
+                "Slat-Position": module.GiraDataPoint(
+                    uid="slat-1",
+                    name="Slat-Position",
+                    can_write=True,
+                )
+            },
+        )
+
+        self.assertTrue(module.exposes_cover_tilt(function, is_shutter=False))
+        self.assertFalse(module.exposes_cover_tilt(function, is_shutter=True))
+
+    def test_cover_tilt_requires_a_writable_data_point(self):
+        function = module.GiraFunction(
+            uid="cover-2",
+            name="Rollladen",
+            function_type="de.gira.schema.functions.Covering",
+            channel_type="de.gira.schema.channels.KNX.Covering",
+            data_points={
+                "Slat-Position": module.GiraDataPoint(
+                    uid="slat-2",
+                    name="Slat-Position",
+                    can_write=False,
+                )
+            },
+        )
+
+        self.assertFalse(module.exposes_cover_tilt(function, is_shutter=False))
+
 
 if __name__ == "__main__":
     unittest.main()
