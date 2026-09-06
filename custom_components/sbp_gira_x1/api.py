@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from collections import deque
 from collections.abc import Iterable
 from typing import Any
 
@@ -41,6 +42,7 @@ class GiraX1Client:
         self._timeout = aiohttp.ClientTimeout(total=15)
         # Current poll only; exception messages may contain secret-bearing URLs.
         self.last_read_errors: dict[str, str] = {}
+        self.cover_write_events: deque[dict[str, Any]] = deque(maxlen=40)
 
     async def _request(
         self,

@@ -20,6 +20,11 @@ and does not require a cloud service or an inbound callback server.
 
 ## Security model
 
+Version 0.3.2 additionally records the last 40 cover write attempts in memory:
+time, logical and current point IDs, value, completion stage and exception type.
+It never retries commands. This is API-level evidence, not proof of movement.
+The history is cleared on restart. Exception messages and tokens are excluded.
+
 Version 0.3.1 adds passive cover diagnostics: logical point IDs, read/write flags,
 cached values and per-function error types from the latest poll. Diagnostics do
 not send movement commands or perform extra device requests. Error messages and

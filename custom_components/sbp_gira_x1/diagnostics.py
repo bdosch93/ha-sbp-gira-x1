@@ -19,7 +19,8 @@ async def async_get_config_entry_diagnostics(
     coordinator = entry.runtime_data.coordinator
     functions = tuple(coordinator.functions.values())
     return {
-        "diagnostics_version": 1,
+        "diagnostics_version": 2,
+        "cover_write_events": list(coordinator.client.cover_write_events),
         "read_errors": dict(coordinator.client.last_read_errors),
         "cover_functions": cover_diagnostics(
             functions,

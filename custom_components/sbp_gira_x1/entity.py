@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
+from time import monotonic
+
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -40,9 +43,43 @@ class GiraX1Entity(CoordinatorEntity[GiraX1Coordinator]):
     async def write(self, point_name: str, value) -> None:
         """Write a logical data point when the X1 marks it writable."""
         point = self.function.point(point_name)
+        event = None
+        if self.function.function_type == "de.gira.schema.functions.Covering":
+            current = self.coordinator.functions.get(self.function.uid)
+            current_point = current.point(point_name) if current else None
+            event = {
+                "at": datetime.now(timezone.utc).isoformat(),
+                "entity_id": self.entity_id,
+                "function_uid": self.function.uid,
+                "point_name": point_name,
+                "point_uid": point.uid if point else None,
+                "current_point_uid": current_point.uid if current_point else None,
+                "value": value,
+                "result": "pending",
+            }
+            self.coordinator.client.cover_write_events.append(event)
         if point is None or not point.can_write:
+            if event is not None:
+                event["result"] = "skipped_not_writable"
             return
-        await self.coordinator.async_write_value(point.uid, value)
+        if event is None:
+            await self.coordinator.async_write_value(point.uid, value)
+            return
+        started = monotonic()
+        try:
+            # Same single write + refresh, but distinguish each failure stage.
+            await self.coordinator.client.async_set_value(point.uid, value)
+            event["result"] = "write_returned_without_error"
+            await self.coordinator.async_request_refresh()
+        except Exception as err:
+            event["error_type"] = type(err).__name__
+            event["result"] = (
+                "refresh_failed" if event["result"] == "write_returned_without_error"
+                else "write_failed"
+            )
+            raise
+        finally:
+            event["elapsed_seconds"] = round(monotonic() - started, 3)
 
     @property
     def extra_state_attributes(self):
