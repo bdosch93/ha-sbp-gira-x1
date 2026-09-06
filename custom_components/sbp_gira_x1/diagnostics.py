@@ -8,6 +8,7 @@ from typing import Any
 from homeassistant.core import HomeAssistant
 
 from . import GiraX1ConfigEntry
+from .diagnostic_helpers import cover_diagnostics
 
 
 async def async_get_config_entry_diagnostics(
@@ -18,6 +19,13 @@ async def async_get_config_entry_diagnostics(
     coordinator = entry.runtime_data.coordinator
     functions = tuple(coordinator.functions.values())
     return {
+        "diagnostics_version": 1,
+        "read_errors": dict(coordinator.client.last_read_errors),
+        "cover_functions": cover_diagnostics(
+            functions,
+            (coordinator.data or {}).get("values", {}),
+            coordinator.client.last_read_errors,
+        ),
         "host": coordinator.client.host,
         "function_count": len(functions),
         "function_type_counts": dict(

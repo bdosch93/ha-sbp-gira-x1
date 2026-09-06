@@ -20,6 +20,12 @@ and does not require a cloud service or an inbound callback server.
 
 ## Security model
 
+Version 0.3.1 adds passive cover diagnostics: logical point IDs, read/write flags,
+cached values and per-function error types from the latest poll. Diagnostics do
+not send movement commands or perform extra device requests. Error messages and
+request URLs are excluded to avoid leaking tokens. Room names and positions are
+private household data; review diagnostics before sharing them publicly.
+
 During setup Home Assistant sends the supplied Gira X1 user name and password
 directly to the X1's local HTTPS API once. The X1 returns a dedicated 32-character
 client token. Only the host and that token are stored in the Home Assistant config

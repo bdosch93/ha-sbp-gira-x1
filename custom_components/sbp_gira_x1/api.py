@@ -39,6 +39,8 @@ class GiraX1Client:
         # Gira documents that its appliance certificate cannot be publicly trusted.
         self._session = async_get_clientsession(hass, verify_ssl=False)
         self._timeout = aiohttp.ClientTimeout(total=15)
+        # Current poll only; exception messages may contain secret-bearing URLs.
+        self.last_read_errors: dict[str, str] = {}
 
     async def _request(
         self,
@@ -157,14 +159,17 @@ class GiraX1Client:
             async with semaphore:
                 return await self.async_get_function_values(uid)
 
+        function_uids = tuple(function_uids)
         values: dict[str, Any] = {}
         results = await asyncio.gather(
             *(fetch(uid) for uid in function_uids), return_exceptions=True
         )
         errors: list[BaseException] = []
-        for result in results:
+        self.last_read_errors = {}
+        for uid, result in zip(function_uids, results):
             if isinstance(result, BaseException):
                 errors.append(result)
+                self.last_read_errors[uid] = type(result).__name__
             else:
                 values.update(result)
         if errors and not values:
