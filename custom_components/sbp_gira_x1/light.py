@@ -69,11 +69,26 @@ class GiraX1Light(GiraX1Entity, LightEntity):
         return round(value)
 
     async def async_turn_on(self, **kwargs: Any) -> None:
-        if "brightness" in kwargs and self.function.point("Brightness"):
-            await self.write("Brightness", round(kwargs["brightness"] * 100 / 255, 1))
+        brightness_point = self.function.point("Brightness")
+        if "brightness" in kwargs and brightness_point:
+            # Absolute dimming is the command, not a prelude to switching on.
+            # A following OnOff=1 can restore the actuator's switch-on level.
+            if not brightness_point.can_write:
+                raise ValueError("Gira brightness data point is not writable")
+            brightness = max(0, min(255, kwargs["brightness"]))
+            if brightness == 0:
+                await self.write("OnOff", 0)
+                return
+            if "color_temp_kelvin" in kwargs and self.function.point("Color-Temperature"):
+                await self.write("Color-Temperature", round(kwargs["color_temp_kelvin"]))
+            await self.write("Brightness", round(brightness * 100 / 255, 1))
+            return
+        # Plain turn-on retains the actuator's configured switch-on behavior.
+        # Changing color on an already-on light must not re-trigger that level.
+        if self.is_on is not True:
+            await self.write("OnOff", 1)
         if "color_temp_kelvin" in kwargs and self.function.point("Color-Temperature"):
             await self.write("Color-Temperature", round(kwargs["color_temp_kelvin"]))
-        await self.write("OnOff", 1)
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         await self.write("OnOff", 0)
