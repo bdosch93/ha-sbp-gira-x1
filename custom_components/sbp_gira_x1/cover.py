@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+import voluptuous as vol
+
 from homeassistant.components.cover import (
     ATTR_POSITION,
     ATTR_TILT_POSITION,
@@ -13,8 +15,12 @@ from homeassistant.components.cover import (
 )
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from homeassistant.helpers.entity_platform import (
+    AddConfigEntryEntitiesCallback,
+    async_get_current_platform,
+)
 
 from . import GiraX1ConfigEntry
 from .const import COVER_FUNCTION_TYPES, DOMAIN
@@ -48,6 +54,15 @@ async def async_setup_entry(
             )
         )
     async_add_entities(entities)
+    async_get_current_platform().async_register_entity_service(
+        "test_cover_step",
+        {
+            vol.Required("value"): vol.All(int, vol.In((0, 1))),
+            vol.Required("expected_point_uid"): str,
+        },
+        "async_test_cover_step",
+        required_features=[CoverEntityFeature.STOP],
+    )
 
 
 class GiraX1Cover(GiraX1Entity, CoverEntity):
@@ -98,6 +113,30 @@ class GiraX1Cover(GiraX1Entity, CoverEntity):
 
     async def async_stop_cover(self, **kwargs: Any) -> None:
         await self.write("Step-Up-Down", 1)
+
+    async def async_test_cover_step(
+        self, value: int, expected_point_uid: str
+    ) -> None:
+        """Send one explicit diagnostic step value to a verified cover point.
+
+        No direction command, retry or automatic reversal is added. The caller
+        must supply the known point UID, preventing an unnoticed mapping change.
+        """
+        current = self.coordinator.functions.get(self.function.uid)
+        point = current.point("Step-Up-Down") if current else None
+        bound = self.function.point("Step-Up-Down")
+        if (
+            type(value) is not int
+            or value not in (0, 1)
+            or point is None
+            or bound is None
+            or not point.can_write
+            or not bound.can_write
+            or point.uid != expected_point_uid
+            or bound.uid != expected_point_uid
+        ):
+            raise HomeAssistantError("Cover test rejected: value or point mapping invalid")
+        await self.write("Step-Up-Down", value)
 
     async def async_set_cover_position(self, **kwargs: Any) -> None:
         await self.write("Position", 100 - int(kwargs[ATTR_POSITION]))

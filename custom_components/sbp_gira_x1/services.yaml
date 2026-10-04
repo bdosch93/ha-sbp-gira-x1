@@ -1,0 +1,22 @@
+test_cover_step:
+  name: Test cover step command
+  description: Sends one diagnostic binary value to the selected cover's Step-Up-Down point. May move the cover. Verify the point UID and observe the device.
+  target:
+    entity:
+      integration: sbp_gira_x1
+      domain: cover
+  fields:
+    value:
+      name: Binary value
+      required: true
+      selector:
+        number:
+          min: 0
+          max: 1
+          step: 1
+          mode: box
+    expected_point_uid:
+      name: Expected Step-Up-Down UID
+      required: true
+      selector:
+        text:

@@ -20,6 +20,14 @@ and does not require a cloud service or an inbound callback server.
 
 ## Security model
 
+Version 0.3.4 adds the explicit diagnostic action `sbp_gira_x1.test_cover_step`.
+It writes one binary value (0 or 1) to a selected cover's writable
+`Step-Up-Down` point, requiring its expected point UID to match both the
+current and bound mappings. It may move the drive. Use only while observing
+the device; it performs no retry or automatic reversal. Normal cover actions
+remain unchanged. To revert this diagnostic extension, reinstall commit
+`e4b59bb` through HACS and restart Home Assistant.
+
 Version 0.3.2 additionally records the last 40 cover write attempts in memory:
 time, logical and current point IDs, value, completion stage and exception type.
 It never retries commands. This is API-level evidence, not proof of movement.
