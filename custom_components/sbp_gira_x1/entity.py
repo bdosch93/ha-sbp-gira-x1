@@ -8,7 +8,7 @@ from time import monotonic
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN
+from .const import DOMAIN, LIGHT_FUNCTION_TYPES
 from .coordinator import GiraX1Coordinator
 from .models import GiraFunction
 
@@ -63,7 +63,12 @@ class GiraX1Entity(CoordinatorEntity[GiraX1Coordinator]):
                 event["result"] = "skipped_not_writable"
             return
         if event is None:
-            await self.coordinator.async_write_value(point.uid, value)
+            if self.function.function_type in LIGHT_FUNCTION_TYPES:
+                await self.coordinator.async_write_light_value(
+                    self.function.uid, point.uid, value
+                )
+            else:
+                await self.coordinator.async_write_value(point.uid, value)
             return
         started = monotonic()
         try:

@@ -1,0 +1,18 @@
+{
+  "date":"2026-10-18",
+  "status":"release_0.3.5_prepared_for_authorized_deployment",
+  "scope":"Only KNX.Light, ColoredLight and TunableLight write readbacks",
+  "change":"After one successful light PUT, GET only that function and merge observed values into the coordinator cache. Do not request a global refresh for every light write.",
+  "safety":[
+    "No PUT retry, no optimistic state and no new fallback switching command.",
+    "Normal periodic full polling and its deadline are unchanged. async_set_updated_data deliberately not used because it would postpone the periodic poll.",
+    "Cover command paths, cover diagnostics, heating controls, switches, room thresholds and automation configurations unchanged.",
+    "If initial coordinator cache is missing, retain original full refresh behavior.",
+    "Readback failure surfaces to caller without another PUT or invented success."
+  ],
+  "tests":{"command":"python -m unittest discover -s tests -v","passed":33,"new_tests":7,"compileall":"passed","git_diff_check":"passed; line-ending warnings only","physical_tests":false,"production_performance":"not yet measured"},
+  "files":["custom_components/sbp_gira_x1/coordinator.py","custom_components/sbp_gira_x1/entity.py","tests/test_light_readback.py"],
+  "basis":"Home Assistant core2026.10.0 DataUpdateCoordinator async_update_listeners callback checked against versioned primary source; existing custom integration unit-test style reused.",
+  "deployment":"Existing HACS integration update workflow; no direct HA filesystem editing, no credentials change. HB01 owner approved the integration update and short HA restart on18.10.2026. Check running scripts and automations before restart. Production activation receipts remain private in the house repository.",
+  "rollback":"Retain existing integration0.3.4 and original source commit1aab29d; if later activated and regression occurs, restore previous integration version via approved HACS path and restart during safe window."
+}

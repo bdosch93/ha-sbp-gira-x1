@@ -69,3 +69,24 @@ class GiraX1Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         """Write a value and refresh immediately."""
         await self.client.async_set_value(uid, value)
         await self.async_request_refresh()
+
+    async def async_write_light_value(
+        self, function_uid: str, uid: str, value: Any
+    ) -> None:
+        """Confirm a light write by reading only that function, never retrying PUT.
+
+        Keep the normal full-poll timer intact: async_set_updated_data would
+        postpone it on every light operation and could starve temperature reads.
+        Only values actually returned by X1 are merged; no optimistic state.
+        """
+        await self.client.async_set_value(uid, value)
+        if self.data is None:
+            await self.async_request_refresh()
+            return
+        values = await self.client.async_get_function_values(function_uid)
+        # Read the cache after the await to preserve other concurrent updates.
+        self.data = {
+            **self.data,
+            "values": {**self.data["values"], **values},
+        }
+        self.async_update_listeners()

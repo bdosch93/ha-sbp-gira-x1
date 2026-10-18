@@ -20,6 +20,13 @@ and does not require a cloud service or an inbound callback server.
 
 ## Security model
 
+Version 0.3.5 reads back only the affected light function after a light command,
+instead of requesting a full hub refresh after each write. Only observed X1
+values are merged; writes are never retried. Regular full polling, its timer,
+and cover/heating command paths remain unchanged. This reduces read scope;
+actual response-time improvement depends on the X1 and must be measured locally.
+To revert, install commit `1aab29d` through HACS and restart Home Assistant.
+
 Version 0.3.4 adds the explicit diagnostic action `sbp_gira_x1.test_cover_step`.
 It writes one binary value (0 or 1) to a selected cover's writable
 `Step-Up-Down` point, requiring its expected point UID to match both the
